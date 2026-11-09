@@ -36,19 +36,21 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="name">Name</label>
-                                    <input class="form-control @error('name') is-invalid @enderror" id="name" name="name" type="text" placeholder="Masukkan nama lengkap" value="{{ old('name') }}" required>
+                                    <input class="form-control @error('name') is-invalid @enderror" id="name" name="name" type="text" placeholder="Masukkan nama lengkap" value="{{ old('name') }}" 
+                                    required, string, max:100>
                                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="email">Email</label>
-                                    <input class="form-control @error('email') is-invalid @enderror" id="email" name="email" type="email" placeholder="name@company.com" value="{{ old('email') }}" required>
+                                    <input class="form-control @error('email') is-invalid @enderror" id="email" name="email" type="email" placeholder="name@company.com" value="{{ old('email') }}" 
+                                    required, email, max:100, unique:users,email>
                                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="password">Password</label>
-                                    <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" placeholder="••••••••" required>
+                                    <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" placeholder="••••••••" required, min:8, confirmed>
                                     @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">

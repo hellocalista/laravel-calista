@@ -7,86 +7,86 @@ use App\Models\Pelanggan;
 
 class PelangganController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $data['dataPelanggan'] = Pelanggan::all();
-		return view('admin.pelanggan.index',$data);
+        return view('admin.pelanggan.index', $data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.pelanggan.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //dd($request->all());
-        $data['first_name'] = $request->first_name;
-		$data['last_name'] = $request->last_name;
-		$data['birthday'] = $request->birthday;
-		$data['gender'] = $request->gender;
-		$data['email'] = $request->email;
-		$data['phone'] = $request->phone;
-		
-		Pelanggan::create($data);
-		
-		return redirect()->route('pelanggan.index')->with('success','Penambahan Data Berhasil!');
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'birthday'   => 'nullable|date',
+            'gender'     => 'nullable|string',
+            'email'      => 'required|email|unique:pelanggans,email',
+            'phone'      => 'nullable|string|max:20',
+        ]);
 
+        try {
+            Pelanggan::create($request->all());
+            
+            return redirect()->route('pelanggan.index')
+                             ->with('success', 'Penambahan Data Berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                             ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                             ->withInput();
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $data['dataPelanggan'] = Pelanggan::findOrFail($id);
         return view('admin.pelanggan.edit', $data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        $pelanggan_id = $id;
-        $pelanggan = Pelanggan::findOrFail($pelanggan_id);
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'birthday'   => 'nullable|date',
+            'gender'     => 'nullable|string',
+            'email'      => 'required|email|unique:pelanggans,email,' . $id,
+            'phone'      => 'nullable|string|max:20',
+        ]);
 
-        $pelanggan->first_name = $request->first_name;
-        $pelanggan->last_name = $request->last_name;
-        $pelanggan->birthday = $request->birthday;
-        $pelanggan->gender = $request->gender;
-        $pelanggan->email = $request->email;
-        $pelanggan->phone = $request->phone;
+        try {
+            $pelanggan = Pelanggan::findOrFail($id);
+            $pelanggan->update($request->all());
 
-        $pelanggan->save();
-        return redirect()->route('pelanggan.index')->with('success', 'Perubahan Data Berhasil!');
+            return redirect()->route('pelanggan.index')
+                             ->with('success', 'Perubahan Data Berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                             ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                             ->withInput();
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $pelanggan = Pelanggan::findOrFail($id);
+        try {
+            $pelanggan = Pelanggan::findOrFail($id);
+            $pelanggan->delete();
 
-        $pelanggan->delete();
-        return redirect()->route('pelanggan.index')->with('success', 'Data Berhasil Dihapus!');
+            return redirect()->route('pelanggan.index')
+                             ->with('success', 'Data Berhasil Dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->route('pelanggan.index')
+                             ->with('error', 'Gagal menghapus data: ' . $e->getMessage());
+        }
     }
 }
